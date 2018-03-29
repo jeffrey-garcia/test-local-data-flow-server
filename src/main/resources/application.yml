@@ -1,0 +1,24 @@
+# Enable Spring Cloud Dataflow Authentication
+security:
+  basic:
+    enabled: true
+    realm: Spring Cloud Data Flow
+
+# Use File-based Authentication
+spring:
+  cloud:
+    dataflow:
+      security:
+        authentication:
+          file:
+            enabled: true
+            users:
+              admin: password, ROLE_VIEW, ROLE_CREATE, ROLE_MANAGE
+              guest: guest, ROLE_VIEW
+
+# Disable security to allow access actuator sensitive endpoints
+# (includes environment, health, beans, metrics, trace, configprops, and dump)
+management:
+  contextPath: /management
+  security:
+    enabled: true
