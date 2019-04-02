@@ -173,6 +173,22 @@ If nothing is output to the console, there might be authentication problem with 
 Outstanding:
 - resolve the H2 console access issue when Spring Security is enabled
 
+### Rest API:
+List all tasks definitions:
+```sh
+curl 'http://localhost:9393/tasks/definitions' -i -X GET -u admin:password
+```
+
+Retrieve task definition detail
+```sh
+curl 'http://localhost:9393/tasks/definitions/spring-cloud-task-1' -i -X GET -u admin:password
+```
+
+Launching a task
+```sh
+curl 'http://localhost:9393/tasks/executions' -i -X POST -d 'name=spring-cloud-task-1' -u admin:password
+```
+
 ### References:
 
 <br/>
