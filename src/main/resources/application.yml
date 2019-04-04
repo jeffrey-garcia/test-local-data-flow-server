@@ -1,7 +1,8 @@
-# Enable Spring Cloud Dataflow Authentication
+# Temporary disable Spring Cloud Dataflow Authentication
+# to resolve the H2 console access issue when Spring Security is enabled
 security:
   basic:
-    enabled: true
+    enabled: false
     realm: Spring Cloud Data Flow
 
 # Use File-based Authentication

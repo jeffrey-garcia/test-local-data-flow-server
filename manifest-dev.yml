@@ -5,5 +5,5 @@ applications:
   instances: 1
   host: test-spring-dataflow-server
   domains:
-  - apps.eas.pcf.manulife.com
-  path: target/test-spring-dataflow-server-0.0.1-SNAPSHOT.jar
+  - apps.sea.preview.pcf.manulife.com
+  path: target/test-spring-dataflow-server-0.0.1.jar
