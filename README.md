@@ -57,13 +57,15 @@ keep track of the task execution via Spring Cloud Data Flow
 
 ### Pre-requisite:
 The key components include:
-- Spring Cloud Dataflow Server `v1.3.0`
+- Spring Cloud Dataflow Server `v1.7.4`
 - Dataflow Shell `v1.3.0`
 - Target Runtime:
     - Cloud Foundry (for deployment)
     - local computer (for local development)
 - Application written using Spring Batch and Spring Cloud Task
 - Rabbit MQ (MAC) `v3.6.14`
+- Redis (MAC) `v4.0.2`
+- Embedded H2
 
 <br/>
 
@@ -115,12 +117,17 @@ See [HERE](https://docs.spring.io/spring-cloud-dataflow/docs/current/reference/h
 ##### Registering a cloud task app:
 Register an app from local file system
 ```
-app register --name task2 --type task --uri file:///Users/example/mytask-x.y.z.jar
+app register --name spring-cloud-task-sample --type task --uri file:///Users/example/mytask-x.y.z.jar
+```
+
+Register an app from Maven repository
+```
+app register --name spring-cloud-task-sample --type task --uri maven://{groupId}:{artifactoryId}:{version}
 ```
 
 ##### Creating a task definition:
 ```
-task create mytask --definition "task2"
+task create mytask --definition "spring-cloud-task-sample"
 ```
 
 ##### Launching a task:
@@ -160,7 +167,7 @@ See [HERE](https://docs.spring.io/spring-cloud-dataflow/docs/current/reference/h
 
 To login with the designated Dataflow server, issue the following command:
 ```
-dataflow config server --uri http://localhost:9393 --username admin --password password --skip-ssl-validation tru
+dataflow config server --uri http://localhost:9393 --username admin --password password --skip-ssl-validation true
 ```
 Replace the URL, username and password according to your server's configuration.
 
