@@ -198,4 +198,16 @@ curl 'http://localhost:9393/tasks/executions' -i -X POST -d 'name=spring-cloud-t
 
 ### References:
 
+##### Spring Cloud Data Flow Server - Local (1.7.4)
+https://docs.spring.io/spring-cloud-dataflow/docs/1.7.4.RELEASE/reference/htmlsingle/#getting-started
+
+##### Spring Cloud Data Flow Server - Cloud Foundry (1.7.4)
+https://docs.spring.io/spring-cloud-dataflow-server-cloudfoundry/docs/current/reference/htmlsingle/#getting-started
+
+##### Spring Cloud Data Flow Examples
+https://docs.spring.io/spring-cloud-dataflow-samples/docs/current/reference/htmlsingle/
+
+##### Spring Cloud Data Flow - All Documents (new)
+https://dataflow.spring.io/docs/
+
 <br/>
