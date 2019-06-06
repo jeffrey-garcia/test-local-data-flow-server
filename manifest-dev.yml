@@ -7,7 +7,7 @@ applications:
   host: test-spring-dataflow-server
   domains:
   - apps.sea.preview.pcf.manulife.com
-  path: target/test-spring-dataflow-server-0.0.1.jar
+  path: target/test-spring-dataflow-server-0.1.0.jar
   env:
     SPRING_APPLICATION_JSON: '{"maven": { "remote-repositories": { "repo1": { "url": "https://artifactory.platform.manulife.io/artifactory/libs-release-local"} } } }'
   services:
