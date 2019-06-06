@@ -22,4 +22,12 @@ spring:
 management:
   contextPath: /management
   security:
-    enabled: true
+    enabled: false
+
+# cloud task configuration
+spring-cloud-task:
+  tasks:
+    -
+      definition: spring-cloud-task-sample
+      uri: maven://com.example.jeffrey:spring-cloud-task-redis-cache:0.1.0
+      name: mytask

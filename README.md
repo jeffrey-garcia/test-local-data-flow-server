@@ -101,7 +101,7 @@ Bulk Import out-of-the-box stream applications for RabbitMQ using the URI:
 Download the executable jar at:
 - [HERE](https://repo.spring.io/libs-release/org/springframework/cloud/spring-cloud-dataflow-shell/1.3.0.RELEASE/)
 
-To start the Data Flow Shell for the Data Flow server running in classic mode: 
+To start the Data Flow Shell for the Data Flow server running in classic mode:
 ```
 java -jar spring-cloud-dataflow-shell-1.3.0.RELEASE.jar
 ```
@@ -181,6 +181,18 @@ Outstanding:
 - resolve the H2 console access issue when Spring Security is enabled
 
 ### Rest API:
+Registering an app with type `task`:
+```sh
+curl 'http://localhost:9393/apps/task/spring-cloud-task-sample' -i -X POST  -u admin:password \
+-d 'uri=maven%3A%2F%2F{groupId}%3A{artifactoryId}%3A{version}'
+```
+
+Creating a new task definition:
+```sh
+curl 'http://localhost:9393/tasks/definitions' -i -X POST  -u admin:password \
+-d 'name=mytask&definition=spring-cloud-task-sample'
+```
+
 List all tasks definitions:
 ```sh
 curl 'http://localhost:9393/tasks/definitions' -i -X GET -u admin:password

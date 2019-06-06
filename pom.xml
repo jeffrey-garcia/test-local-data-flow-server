@@ -5,7 +5,7 @@
 
 	<groupId>com.example.jeffrey.localdataflowserver</groupId>
 	<artifactId>test-spring-dataflow-server</artifactId>
-	<version>0.0.1</version>
+	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>test-spring-dataflow-server</name>
@@ -84,6 +84,13 @@
 			<version>${hibernate.version}</version>
 		</dependency>
 
+		<!-- config client dependency -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+			<version>1.4.5.RELEASE</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -91,11 +98,61 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>local</id>
+			<dependencies>
+				<!-- specific dependencies for local environment -->
+			</dependencies>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/main/resources/local</directory>
+					</resource>
+				</resources>
+				<finalName>${project.artifactId}-local-${project.version}</finalName>
+			</build>
+		</profile>
+
+		<profile>
+			<id>cloud</id>
+			<activation>
+				<!-- default to cloud environment if not specified -->
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+
+			</dependencies>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/main/resources/cloud</directory>
+					</resource>
+				</resources>
+				<finalName>${project.artifactId}-${project.version}</finalName>
+			</build>
+		</profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<!--add build information to the actuator /info endpoint-->
+							<goal>build-info</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<!--add git information to the actuator /info endpoint-->
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

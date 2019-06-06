@@ -12,3 +12,4 @@ applications:
     SPRING_APPLICATION_JSON: '{"maven": { "remote-repositories": { "repo1": { "url": "https://artifactory.platform.manulife.io/artifactory/libs-release-local"} } } }'
   services:
   - redis-cache-service
+  - config-service

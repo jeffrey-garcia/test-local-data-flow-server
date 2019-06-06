@@ -1,0 +1,33 @@
+# Temporary disable Spring Cloud Dataflow Authentication
+# to resolve the H2 console access issue when Spring Security is enabled
+security:
+  basic:
+    enabled: false
+    realm: Spring Cloud Data Flow
+
+# Use File-based Authentication
+spring:
+  cloud:
+    dataflow:
+      security:
+        authentication:
+          file:
+            enabled: true
+            users:
+              admin: password, ROLE_VIEW, ROLE_CREATE, ROLE_MANAGE
+              guest: guest, ROLE_VIEW
+
+# Disable security to allow access actuator sensitive endpoints
+# (includes environment, health, beans, metrics, trace, configprops, and dump)
+management:
+  contextPath: /management
+  security:
+    enabled: false
+
+# cloud task configuration
+spring-cloud-task:
+  tasks:
+    -
+      definition: spring-cloud-task-sample
+      uri: maven://com.example.jeffrey:spring-cloud-task-redis-cache:0.1.0
+      name: mytask
