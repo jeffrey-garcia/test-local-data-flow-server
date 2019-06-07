@@ -46,6 +46,7 @@ public class LocalDataFlowServerConfig {
             String port = environment.getProperty("local.server.port");
 
             try {
+                Assert.assertNotNull("local server port is null", port);
                 Assert.assertNotNull("task config is null", springCloudTaskConfig.getTasks());
                 Assert.assertTrue("task config is empty", springCloudTaskConfig.getTasks().size() > 0);
 
