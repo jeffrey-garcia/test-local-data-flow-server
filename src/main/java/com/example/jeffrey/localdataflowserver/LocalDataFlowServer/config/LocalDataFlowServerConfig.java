@@ -4,11 +4,15 @@ import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.actuate.endpoint.HealthEndpoint;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
+import org.springframework.cloud.context.restart.RestartEndpoint;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,10 +42,11 @@ public class LocalDataFlowServerConfig {
     @Autowired
     private Environment environment;
 
+    @Qualifier("taskConfigurator")
     @Bean
-    public CommandLineRunner commandLineRunner(RestTemplate restTemplate) {
+    public CommandLineRunner taskConfigurator() {
         return args -> {
-            LOGGER.info("CommandLineRunner running");
+            LOGGER.info("taskConfigurator running");
 
             String port = environment.getProperty("local.server.port");
 
@@ -71,7 +76,7 @@ public class LocalDataFlowServerConfig {
                         MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
                         requestBody.add("uri", taskConfig.getUri());
                         try {
-                            ResponseEntity<?> responseEntity = restTemplate.postForEntity(uri, requestBody, Object.class);
+                            ResponseEntity<?> responseEntity = restTemplate().postForEntity(uri, requestBody, Object.class);
                             LOGGER.info("http status: {}", responseEntity.getStatusCode());
                         } catch (RestClientException e) {
                             LOGGER.error(e.getMessage(), e);
@@ -86,7 +91,7 @@ public class LocalDataFlowServerConfig {
                         requestBody.add("name", taskConfig.getName());
                         requestBody.add("definition", taskConfig.getDefinition());
                         try {
-                            ResponseEntity<?> responseEntity = restTemplate.postForEntity(uri, requestBody, Object.class);
+                            ResponseEntity<?> responseEntity = restTemplate().postForEntity(uri, requestBody, Object.class);
                             LOGGER.info("http status: {}", responseEntity.getStatusCode());
                         } catch (RestClientException e) {
                             LOGGER.error(e.getMessage(), e);
@@ -101,7 +106,7 @@ public class LocalDataFlowServerConfig {
     }
 
     @Bean
-    ApplicationListener applicationListener(CommandLineRunner commandLineRunner) {
+    ApplicationListener applicationListener() {
         return new ApplicationListener<EnvironmentChangeEvent>() {
             @Override
             public void onApplicationEvent(EnvironmentChangeEvent environmentChangeEvent) {
@@ -110,9 +115,36 @@ public class LocalDataFlowServerConfig {
                 // all the beans with RefreshScope should have been re-initialized
                 // invoke the CommandLineRunner bean to do the work that make the new values effectuate
                 try {
-                    commandLineRunner.run();
+                    taskConfigurator().run();
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
+                }
+            }
+        };
+    }
+
+    @Autowired
+    public HealthEndpoint healthEndpoint;
+
+    @Autowired
+    public RestartEndpoint restartEndpoint;
+
+    @Qualifier("heartbeatPolling")
+    @Bean
+    public CommandLineRunner heartbeat() {
+        return args -> {
+            LOGGER.info("heartbeat running");
+
+            while(true) {
+                Health health = healthEndpoint.invoke();
+                Object dbHealthDetail = health.getDetails().get("db");
+                LOGGER.info("db health detail: {}", dbHealthDetail);
+                if (dbHealthDetail != null && dbHealthDetail.toString().toUpperCase().contains("DOWN")) {
+                    LOGGER.info("will proceed restart");
+                    restartEndpoint.invoke();
+                    break;
+                } else {
+                    Thread.sleep(30000);
                 }
             }
         };

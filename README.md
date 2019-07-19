@@ -208,6 +208,11 @@ Launching a task
 curl 'http://localhost:9393/tasks/executions' -i -X POST -d 'name=spring-cloud-task-1' -u admin:password
 ```
 
+Verifying current tasks execution number
+```sh
+curl 'http://localhost:9393/tasks/executions/current' -i -X GET -u admin:password
+```
+
 ### References:
 
 ##### Spring Cloud Data Flow Server - Local (1.7.4)

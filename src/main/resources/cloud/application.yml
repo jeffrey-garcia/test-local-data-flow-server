@@ -24,6 +24,11 @@ management:
   security:
     enabled: false
 
+#enable actuator restart endpoint
+endpoints:
+  restart:
+    enabled: true
+
 # cloud task configuration
 spring-cloud-task:
   tasks:
