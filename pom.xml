@@ -175,7 +175,7 @@
 						<directory>src/main/resources/cloud</directory>
 					</resource>
 				</resources>
-				<finalName>${project.artifactId}-${project.version}</finalName>
+				<finalName>${project.artifactId}-cloud-${project.version}</finalName>
 			</build>
 		</profile>
 	</profiles>
