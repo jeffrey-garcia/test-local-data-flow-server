@@ -3,7 +3,7 @@ applications:
 - name: test-spring-dataflow-server
   memory: 4G
   disk_quota: 4G
-  instances: 1
+  instances: 2
   host: test-spring-dataflow-server
   domains:
   - apps.sea.preview.pcf.manulife.com

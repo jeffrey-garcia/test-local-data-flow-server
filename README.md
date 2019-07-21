@@ -113,7 +113,6 @@ dataflow config server --uri http://localhost:9393 --username admin --password p
 
 See [HERE](https://docs.spring.io/spring-cloud-dataflow/docs/current/reference/htmlsingle/#configuration-security-authentication-via-shell)
 
-
 ##### Registering a cloud task app:
 Register an app from local file system
 ```
@@ -212,6 +211,73 @@ Verifying current tasks execution number
 ```sh
 curl 'http://localhost:9393/tasks/executions/current' -i -X GET -u admin:password
 ```
+
+### Auto-Scaling on Cloud Foundry
+
+For a typical data-flow server deployed as single instance with 8GB memory on PCF, it's seen that
+the hardware resources saturation happens at around 20 concurrent requests (CPU utilization over 200%),
+where subsequent requests will encounter http 500 error and no more new task can be launched.
+- To serve 200 concurrent requests, need at minimum 200/20 = 10 instances (total 80GB memory)
+- To serve 400 concurrent requests, need at minimum 400/20 = 20 instances (total 160GB memory)
+
+##### Approach
+- setup 2 instances as initital deploy settings
+- when all available instances encounter CPU spike (over threshold 200%), PCF auto create additional instances
+- the next incoming request will be served in a round-robin fashion over the available instances
+
+For example:
+1. at beginning, only 2 default instances running
+2. start of business hour
+3. subsequent requests to data-flow will be shared among all available instances
+4. if CPU utilization exceed above threshold, then initiate PCF to increase available instance by 1, go back to step (3)
+5. if CPU utilization drop below threshold, then initiate PCF to decrease available instance by 1, go back to step (3)
+
+Throughout the day, we should expect the number of running instances jumps from 2
+to a higher number until reaching the limit of max auto-scalable instance configured.
+Then after business hours or holiday, we should expect the number of running instances
+drops back to 2.
+
+##### Preparation
+Download and install the app autoscaler plugin for CF cli, see
+- https://docs.pivotal.io/pivotalcf/2-4/appsman-services/autoscaler/using-autoscaler-cli.html#install
+
+Push the app to PCF
+```sh
+cf push -f manifest-dev.yml
+```
+
+Enable autoscaling for the PCF app
+```sh
+cf enable-autoscaling test-spring-dataflow-server
+```
+
+Configure with a dedicated autoscaling manifest
+```sh
+cf configure-autoscaling test-spring-dataflow-server autoscaler-manifest-dev.yml
+```
+
+##### Implementation
+- limit the max concurrent execution in data-flow to 20 (as this is where the hardware saturation
+is observed on PCF)
+- setup auto-scaling rule where CPU min threshold is 30% and max threshold is 200%
+- setup the maximum instances can be auto-created by PCF, for example if need to serve 400 concurrent
+requests (400 agents refresh my performance computation), need at minimum 400/20 = 20 instances
+(total 160GB memory), the more concurrent requests need to serve, the more instances is needed and
+the more memory will be required
+- liaise with platform team to calibrate the memory required to PROD CMP space in PCF.
+
+See also:
+https://docs.pivotal.io/pivotalcf/2-5/appsman-services/autoscaler/using-autoscaler.html#metric
+
+##### Drawbacks
+- note there will be startup time overheads to spin up this new instance ~30-90s
+before it could serve new requests
+- the H2 db is embedded to each instance, when the instance is dismissed the execution
+log of the cloud task will be purged with the db file
+`* increased difficulties in troubleshooting and problem investigation, particularly when the instance is already destroyed`
+- the memory cost is high depending on the max auto-scalable instance and the memory
+configured per instance, say 20 instances and 8GB each sums up to total 160 GB memory
+`* if optimization at the code-level can reduce the running time and memory drastically (down to 5s per request with low memory consumption), then it should be where the investment goes to and the data-flow is reserved for the team performance task which runs as a system batch every 2 hours`
 
 ### References:
 
