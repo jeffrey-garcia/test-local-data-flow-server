@@ -22,7 +22,10 @@ spring:
 management:
   contextPath: /management
   security:
-    enabled: false
+    enabled: true
+    user:
+      name: admin
+      password: password
 
 #enable actuator restart endpoint
 endpoints:
